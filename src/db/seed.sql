@@ -1,23 +1,23 @@
 -- CREATE DATABASE reviews;
-\c reviews
+-- \c reviews
 
 COPY reviews
-FROM '/tmp/atelier-reviews-data/reviews.csv'
+FROM '/tmp/data/reviews.csv'
 DELIMITER ','
 CSV HEADER;
 
 COPY photos
-FROM '/tmp/atelier-reviews-data/reviews_photos.csv'
+FROM '/tmp/data/reviews_photos.csv'
 DELIMITER ','
 CSV HEADER;
 
 COPY characteristics
-FROM '/tmp/atelier-reviews-data/characteristics.csv'
+FROM '/tmp/data/characteristics.csv'
 DELIMITER ','
 CSV HEADER;
 
 COPY characteristics_reviews
-FROM '/tmp/atelier-reviews-data/characteristic_reviews.csv'
+FROM '/tmp/data/characteristic_reviews.csv'
 DELIMITER ','
 CSV HEADER;
 

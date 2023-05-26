@@ -1,5 +1,7 @@
 import { Sequelize, DataTypes, Deferrable } from 'sequelize';
 import dotenv from 'dotenv';
+import fs from 'node:fs';
+import path from 'node:path';
 
 // Create a database connection and export it from this file.
 // Confirm that the credentials supplied for the connection are correct.
@@ -28,8 +30,9 @@ const testConnection = async () => {
     console.error('Unable to connect to the database:', error);
   }
 }
+testConnection();
 
-// testConnection();
+
 
 // define data structure
 const Reviews = db.define('reviews', {
@@ -48,6 +51,8 @@ const Reviews = db.define('reviews', {
   reviewer_email: { type: DataTypes.STRING, allowNull: false },
   response: DataTypes.STRING,
   helpfulness: { type: DataTypes.INTEGER, defaultValue: 0 },
+},{
+  timestamps: false
 });
 
 const Photos = db.define('photos', {
@@ -57,12 +62,16 @@ const Photos = db.define('photos', {
     references: {model: Reviews, key: 'id', deferrable: new Deferrable.INITIALLY_IMMEDIATE() }
   },
   url: { type: DataTypes.STRING, allowNull: false }
+},{
+  timestamps: false
 })
 
 const Characteristics = db.define('characteristics', {
   id: { type: DataTypes.INTEGER, primaryKey: true },
   product_id: { type: DataTypes.INTEGER, allowNull: false },
   name: { type: DataTypes.STRING, allowNull: false }
+},{
+  timestamps: false
 })
 
 const CharacteristicsReviews = db.define('characteristics_reviews', {
@@ -73,11 +82,27 @@ const CharacteristicsReviews = db.define('characteristics_reviews', {
     references: {model: Reviews, key: 'id', deferrable: new Deferrable.INITIALLY_IMMEDIATE() }
   },
   value: { type: DataTypes.DECIMAL(5, 4), allowNull: false }
+},{
+  timestamps: false
 })
 
 
-// 1:M
-// Users.hasMany(Messages);
-// Messages.belongsTo(Users);
+/**
+ * Seeding data by executing seed.sql
+ */
+db.sync()
+  .then(() => Reviews.count())
+  .then((count) => {
+    // run seed.sql only if Reviews is empty
+    if (count === 0) {
+      const sqlString = fs.readFileSync(path.join(__dirname, '/seed.sql'), 'utf8');
+      return db.query(sqlString);
+    }
+    return undefined;
+  })
+  .then(() => console.log("Done seeding data."))
+  .catch(err => console.log("Error seeding data", err))
+  .then(() => process.exit());
+
 
 export { db, Reviews, Photos, Characteristics, CharacteristicsReviews };
