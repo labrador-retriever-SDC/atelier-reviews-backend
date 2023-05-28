@@ -1,6 +1,9 @@
-import express, { Application, Request, Response } from 'express';
+import { Application } from 'express';
+import express = require('express');
 import cors from 'cors';
 import dotenv from 'dotenv';
+
+import * as controllers from './controllers/controllers'
 
 const app: Application = express();
 dotenv.config();
@@ -8,12 +11,24 @@ dotenv.config();
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({extended: true}));
-app.get('/', async(req: Request, res: Response): Promise<Response> => res.status(200).send({ message: 'Welcome to SDC 🤗'}));
+
+
+/**
+ * Routes
+ */
+app.get('/', controllers.home);
+
+app.get('/reviews', controllers.getReviews)
+app.get('/reviews/meta', controllers.getReviewsMeta)
+app.post('/reviews', controllers.createReview)
+app.put('/reviews/:review_id/helpful', controllers.markHelpful)
+app.put('/reviews/:review_id/report', controllers.reportReview)
+
 
 const PORT = process.env.PORT || 3000;
 
 try {
-  app.listen(3000, () => {console.log(`Now running on http://localhost:${PORT}`)})
+  app.listen(PORT, () => {console.log(`Now running on http://localhost:${PORT}`)})
 } catch (error) {
   console.log('Error ocurred')
 }

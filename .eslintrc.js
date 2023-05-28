@@ -27,6 +27,8 @@ module.exports = {
             "ts": "never",
             "tsx": "never"
           }
-       ]
+       ],
+       'no-console': 'off',
+       "@typescript-eslint/no-explicit-any": "off"
   },
 }
