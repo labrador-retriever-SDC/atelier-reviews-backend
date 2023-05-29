@@ -15,7 +15,7 @@ module.exports = {
       sourceType: 'module',
       project: './tsconfig.json',
   },
-  ignorePatterns: ['dist', 'node_modules', 'dump', '*config.js', '*.test.js'],
+  ignorePatterns: ['dist', 'node_modules', 'dump', '*config.js', '*.test.js', '.eslintrc.js'],
   plugins: ['@typescript-eslint'],
   rules: {
       "import/extensions": [
