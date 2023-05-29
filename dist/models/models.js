@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -62,7 +39,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.addReview = exports.getReviewsMeta = exports.reportReview = exports.markHelpful = exports.getReviews = void 0;
 /* eslint-disable camelcase */
 var sequelize_1 = require("sequelize");
-var db = __importStar(require("../db/index"));
+// import db from '../db/index'
+var models_1 = require("../db/models");
 var getReviews = function (productID, count, sort, page) { return __awaiter(void 0, void 0, void 0, function () {
     var order;
     return __generator(this, function (_a) {
@@ -79,14 +57,14 @@ var getReviews = function (productID, count, sort, page) { return __awaiter(void
                 order = 'helpfulness';
                 break;
         }
-        return [2 /*return*/, db.Review.findAll({
+        return [2 /*return*/, models_1.Review.findAll({
                 where: { product_id: Number(productID), reported: false },
                 limit: Number(count),
                 offset: Math.max(Number(page) - 1, 0) * Number(count),
                 attributes: [['id', 'review_id'], 'rating', 'summary', 'recommend',
                     'response', 'body', 'date', 'reviewer_name', 'helpfulness'],
                 order: [[order, 'DESC']],
-                include: { model: db.Photo, attributes: ['id', 'url'] }
+                include: { model: models_1.Photo, attributes: ['id', 'url'] }
                 // raw: true
             })];
     });
@@ -96,7 +74,7 @@ var getReviewsMeta = function (productID) { return __awaiter(void 0, void 0, voi
     var RatingCount, ratings, RecommendCount, recommended, sqlString, charWithAvgValue, Characteristics;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, db.Review.findAll({
+            case 0: return [4 /*yield*/, models_1.Review.findAll({
                     where: { product_id: Number(productID) },
                     attributes: ['rating', [sequelize_1.Sequelize.fn('COUNT', 'rating'), 'ratingCnt']],
                     group: 'rating',
@@ -109,7 +87,7 @@ var getReviewsMeta = function (productID) { return __awaiter(void 0, void 0, voi
                     var rating = x.rating, ratingCnt = x.ratingCnt;
                     ratings[rating] = ratingCnt;
                 });
-                return [4 /*yield*/, db.Review.findAll({
+                return [4 /*yield*/, models_1.Review.findAll({
                         where: { product_id: Number(productID) },
                         attributes: ['recommend', [sequelize_1.Sequelize.fn('COUNT', 'recommend'), 'recommendCnt']],
                         group: 'recommend',
@@ -123,7 +101,7 @@ var getReviewsMeta = function (productID) { return __awaiter(void 0, void 0, voi
                     recommended[recommend] = recommendCnt;
                 });
                 sqlString = "(SELECT avg(value)::numeric(18, 16)\n      FROM characteristics_reviews\n      WHERE char_id = characteristics.id)";
-                return [4 /*yield*/, db.Characteristic.findAll({
+                return [4 /*yield*/, models_1.Characteristic.findAll({
                         where: { product_id: Number(productID) },
                         attributes: ['name', 'id', [sequelize_1.Sequelize.literal(sqlString), 'value'],
                         ],
@@ -150,7 +128,7 @@ var addReview = function (newReview) { return __awaiter(void 0, void 0, void 0, 
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, db.Review.create({
+                return [4 /*yield*/, models_1.Review.create({
                         product_id: product_id,
                         rating: rating,
                         summary: summary,
@@ -171,14 +149,14 @@ var addReview = function (newReview) { return __awaiter(void 0, void 0, void 0, 
                         var obj = { review_id: review_id_1, url: url };
                         return obj;
                     });
-                    db.Photo.bulkCreate(photos);
+                    models_1.Photo.bulkCreate(photos);
                 }
                 characteristics = Object.keys(newReview.characteristics)
                     .map(function (char_id) {
                     var obj = { char_id: char_id, review_id: review_id_1, value: newReview.characteristics[char_id] };
                     return obj;
                 });
-                db.CharacteristicsReview.bulkCreate(characteristics);
+                models_1.CharacteristicsReview.bulkCreate(characteristics);
                 return [2 /*return*/, undefined];
             case 3:
                 err_1 = _a.sent();
@@ -189,10 +167,10 @@ var addReview = function (newReview) { return __awaiter(void 0, void 0, void 0, 
 }); };
 exports.addReview = addReview;
 var markHelpful = function (reviewID) {
-    return db.Review.increment({ helpfulness: 1 }, { where: { id: Number(reviewID) } });
+    return models_1.Review.increment({ helpfulness: 1 }, { where: { id: Number(reviewID) } });
 };
 exports.markHelpful = markHelpful;
 var reportReview = function (reviewID) {
-    return db.Review.update({ reported: true }, { where: { id: Number(reviewID) } });
+    return models_1.Review.update({ reported: true }, { where: { id: Number(reviewID) } });
 };
 exports.reportReview = reportReview;

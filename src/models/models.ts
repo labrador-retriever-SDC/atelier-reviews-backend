@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { Sequelize } from 'sequelize';
-import * as db from '../db/index'
+// import db from '../db/index'
+import { Review, Photo, Characteristic, CharacteristicsReview} from '../db/models';
 
 const getReviews = async (productID: string, count: string, sort: string, page: string) => {
   let order = '';
@@ -16,21 +17,21 @@ const getReviews = async (productID: string, count: string, sort: string, page: 
       order = 'helpfulness';
       break;
   }
-  return db.Review.findAll({
+  return Review.findAll({
     where: { product_id: Number(productID), reported: false },
     limit: Number(count),
     offset: Math.max(Number(page) - 1, 0) * Number(count),
     attributes: [['id', 'review_id'], 'rating', 'summary', 'recommend',
       'response', 'body', 'date', 'reviewer_name', 'helpfulness'],
     order: [[order, 'DESC']],
-    include: { model: db.Photo, attributes: ['id', 'url'] }
+    include: { model: Photo, attributes: ['id', 'url'] }
     // raw: true
   })
 }
 
 const getReviewsMeta = async (productID: string) => {
   // // testing
-  // const countAll = await db.Review.count({
+  // const countAll = await Review.count({
   //   where: { product_id: Number(productID) }
   // })
   // console.log(countAll)
@@ -38,7 +39,7 @@ const getReviewsMeta = async (productID: string) => {
   /**
    * Rating Breakdown
    */
-  const RatingCount: Array<any> = await db.Review.findAll({
+  const RatingCount: Array<any> = await Review.findAll({
     where: { product_id: Number(productID) },
     attributes: ['rating', [Sequelize.fn('COUNT', 'rating'), 'ratingCnt']],
     group: 'rating',
@@ -53,7 +54,7 @@ const getReviewsMeta = async (productID: string) => {
   /**
    * Recommend Breakdown
    */
-  const RecommendCount: Array<any> = await db.Review.findAll({
+  const RecommendCount: Array<any> = await Review.findAll({
     where: { product_id: Number(productID) },
     attributes: ['recommend', [Sequelize.fn('COUNT', 'recommend'), 'recommendCnt']],
     group: 'recommend',
@@ -72,7 +73,7 @@ const getReviewsMeta = async (productID: string) => {
   const sqlString = `(SELECT avg(value)::numeric(18, 16)
       FROM characteristics_reviews
       WHERE char_id = characteristics.id)`;
-  const charWithAvgValue: Array<any> = await db.Characteristic.findAll({
+  const charWithAvgValue: Array<any> = await Characteristic.findAll({
     where: { product_id: Number(productID) },
     attributes: ['name', 'id', [Sequelize.literal(sqlString), 'value'],
     ],
@@ -96,7 +97,7 @@ const addReview = async (newReview: any) => {
     /**
     * add new review
     */
-    const createdReview = await db.Review.create({
+    const createdReview = await Review.create({
       product_id, rating, summary, body, recommend,
       reviewer_name: name,
       reviewer_email: email,
@@ -112,7 +113,7 @@ const addReview = async (newReview: any) => {
         const obj = { review_id, url };
         return obj;
       })
-      db.Photo.bulkCreate(photos)
+      Photo.bulkCreate(photos)
     }
 
     /**
@@ -123,7 +124,7 @@ const addReview = async (newReview: any) => {
         const obj = { char_id, review_id, value: newReview.characteristics[char_id] };
         return obj;
       })
-    db.CharacteristicsReview.bulkCreate(characteristics)
+    CharacteristicsReview.bulkCreate(characteristics)
 
     return undefined;
   } catch (err) {
@@ -133,14 +134,14 @@ const addReview = async (newReview: any) => {
 
 
 const markHelpful = (reviewID: string) =>
-  db.Review.increment(
+  Review.increment(
     { helpfulness: 1 },
     { where: { id: Number(reviewID) } }
   );
 
 
 const reportReview = (reviewID: string) =>
-  db.Review.update(
+  Review.update(
     { reported: true },
     { where: { id: Number(reviewID) } }
   );
