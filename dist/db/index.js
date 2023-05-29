@@ -16,18 +16,15 @@ var dbHost = process.env.DB_HOST || '';
 var db = new sequelize_1.Sequelize(dbName, dbUser, dbPass, {
     host: dbHost,
     dialect: 'postgres',
+    // benchmark: true,
+    // logging(sql, timing) {
+    //   console.log(`[Execution time: ${timing}ms]
+    //    -  ${sql} \n`)
+    // },
     logging: false
 });
-// const testConnection = async () => {
-//   try {
-//     await db.authenticate();
-//     console.log('Connection has been established successfully.');
-//   } catch (error) {
-//     console.error('Unable to connect to the database:', error);
-//   }
-// }
-// testConnection();
 var dbConnection = function () { return db; };
+// // Testing connection
 // db.authenticate()
 //   .then(() =>
 //     console.log('Connection has been established successfully.'))

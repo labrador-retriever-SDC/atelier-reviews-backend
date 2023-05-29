@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import request from "supertest";
 import createServer from "../src/server";
-import dbConnection from '../src/db/index';
+// import dbConnection from '../src/db/index';
 
 // beforeEach((done) => {
 //   const db = dbConnection();

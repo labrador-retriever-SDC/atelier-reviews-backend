@@ -22,6 +22,8 @@ const createServer = () => {
   app.post('/reviews', controllers.createReview)
   app.put('/reviews/:review_id/helpful', controllers.markHelpful)
   app.put('/reviews/:review_id/report', controllers.reportReview)
+  // Mismatch URL
+  app.all('*', controllers.noSuchPage);
   return app;
 }
 

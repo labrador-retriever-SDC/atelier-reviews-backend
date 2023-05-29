@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import dbConnection from './index'
-import { Review } from './models'
+import { Review } from '../models/models'
 
 const db = dbConnection();
 
@@ -9,12 +9,14 @@ const db = dbConnection();
  * Seeding data by executing seed.sql
  */
 const migrateData = () => {
+  console.time("Database synced");
+
   db.sync()
-  .then(() => Review.count())
-  .then((count) => {
+  .then(() => Review.findOne())
+  .then((anyReview) => {
     // seed data only if Reviews is empty
-    if (count === 0) {
-      console.log('Loading data...', new Date())
+    if (anyReview === null) {
+      console.log('Loading data...',)
       const sqlString = fs.readFileSync(path.join(__dirname, '/seed.sql'), 'utf8');
       return db.query(sqlString);
     }
@@ -30,7 +32,7 @@ const migrateData = () => {
       `))
   })
   .catch(err => console.log("Error seeding data", err))
-  .finally(() => console.log("Done seeding data.", new Date()))
+  .finally(() => console.timeLog("Database synced"))
 }
 
 export default migrateData;

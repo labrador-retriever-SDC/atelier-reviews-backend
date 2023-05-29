@@ -1,150 +1,90 @@
-/* eslint-disable camelcase */
-import { Sequelize } from 'sequelize';
-// import db from '../db/index'
-import { Review, Photo, Characteristic, CharacteristicsReview} from '../db/models';
+import { DataTypes } from 'sequelize';
+import dbConnection from '../db/index'
 
-const getReviews = async (productID: string, count: string, sort: string, page: string) => {
-  let order = '';
-  switch (sort) {
-    case 'helpful':
-      order = 'helpfulness';
-      break;
-    case 'newest':
-      order = 'date';
-      break;
-    default:
-      // TODO: relevant
-      order = 'helpfulness';
-      break;
-  }
-  return Review.findAll({
-    where: { product_id: Number(productID), reported: false },
-    limit: Number(count),
-    offset: Math.max(Number(page) - 1, 0) * Number(count),
-    attributes: [['id', 'review_id'], 'rating', 'summary', 'recommend',
-      'response', 'body', 'date', 'reviewer_name', 'helpfulness'],
-    order: [[order, 'DESC']],
-    include: { model: Photo, attributes: ['id', 'url'] }
-    // raw: true
-  })
-}
+const db = dbConnection();
 
-const getReviewsMeta = async (productID: string) => {
-  // // testing
-  // const countAll = await Review.count({
-  //   where: { product_id: Number(productID) }
-  // })
-  // console.log(countAll)
-
-  /**
-   * Rating Breakdown
-   */
-  const RatingCount: Array<any> = await Review.findAll({
-    where: { product_id: Number(productID) },
-    attributes: ['rating', [Sequelize.fn('COUNT', 'rating'), 'ratingCnt']],
-    group: 'rating',
-    raw: true
-  })
-  const ratings = {};
-  RatingCount.forEach(x => {
-    const { rating, ratingCnt } = x;
-    ratings[rating] = ratingCnt;
-  })
-
-  /**
-   * Recommend Breakdown
-   */
-  const RecommendCount: Array<any> = await Review.findAll({
-    where: { product_id: Number(productID) },
-    attributes: ['recommend', [Sequelize.fn('COUNT', 'recommend'), 'recommendCnt']],
-    group: 'recommend',
-    raw: true
-  })
-  const recommended = {};
-  RecommendCount.forEach(x => {
-    const { recommend, recommendCnt } = x;
-    recommended[recommend] = recommendCnt;
-  })
-
-
-  /**
-   * Characteristics Breakdown
-   */
-  const sqlString = `(SELECT avg(value)::numeric(18, 16)
-      FROM characteristics_reviews
-      WHERE char_id = characteristics.id)`;
-  const charWithAvgValue: Array<any> = await Characteristic.findAll({
-    where: { product_id: Number(productID) },
-    attributes: ['name', 'id', [Sequelize.literal(sqlString), 'value'],
-    ],
-    raw: true,
-  })
-  const Characteristics = {};
-  charWithAvgValue.forEach(x => {
-    const { name, id, value } = x;
-    Characteristics[name] = { id, value };
-  })
-
-  return { product_id: productID, ratings, recommended, Characteristics };
-};
-
-const addReview = async (newReview: any) => {
-  const {
-    product_id, rating, summary, body, recommend, name, email
-  } = newReview;
-
-  try {
-    /**
-    * add new review
-    */
-    const createdReview = await Review.create({
-      product_id, rating, summary, body, recommend,
-      reviewer_name: name,
-      reviewer_email: email,
-      date: Date.now()
-    })
-    const { id: review_id } = createdReview.toJSON();
-
-    /**
-     * add new photos, if any
-     */
-    if (newReview.photos.length > 0) {
-      const photos = newReview.photos.map((url: string) => {
-        const obj = { review_id, url };
-        return obj;
-      })
-      Photo.bulkCreate(photos)
+// Schemas
+const Review = db.define('reviews', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  product_id: { type: DataTypes.INTEGER, allowNull: false },
+  rating: { type: DataTypes.INTEGER, allowNull: false },
+  date: {
+    type: DataTypes.BIGINT,
+    allowNull: false,
+    get() {
+      const dateInMS = this.getDataValue('date');
+      return new Date(Number(dateInMS));
+    },
+  },
+  summary: DataTypes.STRING,
+  body: {
+    type: DataTypes.STRING(1000),
+    allowNull: false,
+    validate: { len: [50, 1000] }
+  },
+  recommend: { type: DataTypes.BOOLEAN, allowNull: false },
+  reported: { type: DataTypes.BOOLEAN, defaultValue: false },
+  reviewer_name: { type: DataTypes.STRING, allowNull: false },
+  reviewer_email: { type: DataTypes.STRING, allowNull: false },
+  response: {
+    type: DataTypes.STRING,
+    get() {
+      const value = this.getDataValue('response');
+      return value === 'null' ? null : value;
     }
+  },
+  helpfulness: { type: DataTypes.INTEGER, defaultValue: 0 },
+}, {
+  timestamps: false,
+  indexes: [{ unique: false, fields: ['product_id'] }]
+});
 
-    /**
-     * add characteristics reviews
-     */
-    const characteristics = Object.keys(newReview.characteristics)
-      .map((char_id: string) => {
-        const obj = { char_id, review_id, value: newReview.characteristics[char_id] };
-        return obj;
-      })
-    CharacteristicsReview.bulkCreate(characteristics)
+const Photo = db.define('photos', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  review_id: {
+    type: DataTypes.INTEGER,
+    references: { model: Review, key: 'id' }
+  },
+  url: { type: DataTypes.STRING, allowNull: false }
+}, {
+  timestamps: false,
+  // indexes: [{ unique: false, fields: ['review_id'] }]
+})
 
-    return undefined;
-  } catch (err) {
-    return err;
-  }
-}
+const Characteristic = db.define('characteristics', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  product_id: { type: DataTypes.INTEGER, allowNull: false },
+  name: { type: DataTypes.STRING, allowNull: false }
+}, {
+  timestamps: false,
+  indexes: [{ unique: false, fields: ['product_id'] }]
+})
 
+const CharacteristicsReview = db.define('characteristics_reviews', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  char_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: { model: Characteristic, key: 'id' }
+  },
+  review_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: { model: Review, key: 'id' }
+  },
+  value: { type: DataTypes.DECIMAL(5, 4), allowNull: false }
+}, {
+  timestamps: false,
+  indexes: [{ unique: false, fields: ['char_id'] }]
+})
 
-const markHelpful = (reviewID: string) =>
-  Review.increment(
-    { helpfulness: 1 },
-    { where: { id: Number(reviewID) } }
-  );
+// Reviews -> Photos: One-to-Many
+Review.hasMany(Photo, { foreignKey: 'review_id' });
+Photo.belongsTo(Review, { foreignKey: 'review_id' });
+// This creates the `review_id` foreign key in Photos.
 
+// Characteristic -> CharacteristicsReview: One-to-Many
+// Characteristic.hasMany(CharacteristicsReview, { foreignKey: 'char_id' });
+// CharacteristicsReview.belongsTo(Characteristic, { foreignKey: 'char_id' });
 
-const reportReview = (reviewID: string) =>
-  Review.update(
-    { reported: true },
-    { where: { id: Number(reviewID) } }
-  );
-
-
-export { getReviews, markHelpful, reportReview, getReviewsMeta, addReview }
+export { Review, Photo, Characteristic, CharacteristicsReview  }

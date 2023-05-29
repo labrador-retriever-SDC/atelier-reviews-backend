@@ -59,12 +59,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reportReview = exports.markHelpful = exports.createReview = exports.getReviewsMeta = exports.getReviews = exports.home = void 0;
-var models = __importStar(require("../models/models"));
+exports.noSuchPage = exports.reportReview = exports.markHelpful = exports.createReview = exports.getReviewsMeta = exports.getReviews = exports.home = void 0;
+var services = __importStar(require("../services/services"));
 var home = function (req, res) {
     res.json({ message: 'Welcome to SDC 🤗' });
 };
 exports.home = home;
+var noSuchPage = function (req, res) {
+    res.status(404).send({ error: true, message: 'Page not found. Check your URL please' });
+};
+exports.noSuchPage = noSuchPage;
 /**
  * Parameters:
  * product_id: required
@@ -84,7 +88,7 @@ var getReviews = function (req, res) { return __awaiter(void 0, void 0, void 0, 
             res.status(422).send("Error: invalid product_id provided");
             return [2 /*return*/];
         }
-        models.getReviews(product, count, sort, page)
+        services.getReviews(product, count, sort, page)
             .then(function (reviews) {
             res.status(200).send({ product: product, page: page, count: count, reviews: reviews });
         })
@@ -95,13 +99,13 @@ var getReviews = function (req, res) { return __awaiter(void 0, void 0, void 0, 
 exports.getReviews = getReviews;
 var getReviewsMeta = function (req, res) {
     var productID = req.query.product_id;
-    models.getReviewsMeta(productID)
+    services.getReviewsMeta(productID)
         .then(function (result) { return res.json(result); })
         .catch(function () { return res.status(500).send(); });
 };
 exports.getReviewsMeta = getReviewsMeta;
 var createReview = function (req, res) {
-    models.addReview(req.body)
+    services.addReview(req.body)
         .then(function () { return res.sendStatus(201); })
         .catch(function (err) { return res.status(500).send(err); });
 };
@@ -109,7 +113,7 @@ exports.createReview = createReview;
 var markHelpful = function (req, res) {
     var reviewID = req.params.review_id;
     // Status: 204 NO CONTENT
-    models.markHelpful(reviewID)
+    services.markHelpful(reviewID)
         .then(function () {
         res.status(202).json("Marked review as helpful: ".concat(reviewID));
     })
@@ -119,7 +123,7 @@ exports.markHelpful = markHelpful;
 var reportReview = function (req, res) {
     var reviewID = req.params.review_id;
     // Status: 204 NO CONTENT
-    models.reportReview(reviewID)
+    services.reportReview(reviewID)
         .then(function () {
         res.status(202).json("Reported review: ".concat(reviewID));
     })

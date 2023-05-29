@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
-import * as models from '../models/models'
+import * as services from '../services/services'
 
 
 const home = (req: Request, res: Response) => {
   res.json({ message: 'Welcome to SDC 🤗' })
+}
+
+const noSuchPage = (req: Request, res: Response) => {
+  res.status(404).send({ error: true, message: 'Page not found. Check your URL please' });
 }
 
 /**
@@ -26,7 +30,7 @@ const getReviews = async (req: Request, res: Response) => {
     return;
   }
 
-  models.getReviews(product, count, sort, page)
+  services.getReviews(product, count, sort, page)
     .then(reviews => {
       res.status(200).send({ product, page, count, reviews })
     })
@@ -36,21 +40,21 @@ const getReviews = async (req: Request, res: Response) => {
 const getReviewsMeta = (req: Request, res: Response) => {
   const productID = req.query.product_id as string;
 
-  models.getReviewsMeta(productID)
+  services.getReviewsMeta(productID)
     .then((result) => res.json(result))
     .catch(() => res.status(500).send());
 }
 
 const createReview = (req: Request, res: Response) => {
-  models.addReview(req.body)
-    .then(() =>  res.sendStatus(201))
+  services.addReview(req.body)
+    .then(() => res.sendStatus(201))
     .catch((err) => res.status(500).send(err));
 }
 
 const markHelpful = (req: Request, res: Response) => {
   const reviewID = req.params.review_id as string;
   // Status: 204 NO CONTENT
-  models.markHelpful(reviewID)
+  services.markHelpful(reviewID)
     .then(() => {
       res.status(202).json(`Marked review as helpful: ${reviewID}`);
     })
@@ -60,7 +64,7 @@ const markHelpful = (req: Request, res: Response) => {
 const reportReview = (req: Request, res: Response) => {
   const reviewID = req.params.review_id as string;
   // Status: 204 NO CONTENT
-  models.reportReview(reviewID)
+  services.reportReview(reviewID)
     .then(() => {
       res.status(202).json(`Reported review: ${reviewID}`);
     })
@@ -68,4 +72,12 @@ const reportReview = (req: Request, res: Response) => {
 }
 
 
-export { home, getReviews, getReviewsMeta, createReview, markHelpful, reportReview }
+export {
+  home,
+  getReviews,
+  getReviewsMeta,
+  createReview,
+  markHelpful,
+  reportReview,
+  noSuchPage
+}
