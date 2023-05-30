@@ -4,3 +4,4 @@ data/
 .vscode
 dump/
 dist/
+tests/testReport

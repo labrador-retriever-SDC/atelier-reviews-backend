@@ -21,12 +21,12 @@ const dbConnection = (mode = "dev") => {
   return new Sequelize(dbName, dbUser, dbPass, {
     host: dbHost,
     dialect: 'postgres',
-    // benchmark: true,
-    // logging(sql, timing) {
-    //   console.log(`[Execution time: ${timing}ms]
-    //    -  ${sql} \n`)
-    // },
-    logging: false
+    benchmark: true,
+    logging(sql, timing) {
+      console.log(`[Execution time: ${timing}ms]
+       -  ${sql} \n`)
+    },
+    // logging: false
   });
 };
 

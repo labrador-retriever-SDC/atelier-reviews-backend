@@ -18,7 +18,6 @@ const seedData = (db) => {
   .then((result) => {
     // Check if any rows exist
     const anyReview = result[0].length > 0;
-    console.log("anyReview", anyReview)
 
     // seed data only if Reviews is empty
     if (!anyReview) {
@@ -28,9 +27,7 @@ const seedData = (db) => {
     }
     return undefined;
   })
-  .then((result) => {
-    console.log('result', result)
-
+  .then(() => {
     // sync tables with the latest id
     const tables = ['reviews', 'photos', 'characteristics', 'characteristics_reviews'];
 

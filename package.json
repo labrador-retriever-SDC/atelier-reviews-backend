@@ -39,7 +39,7 @@
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
     "start": "ts-node src/app.ts",
     "watch:build": "tsc -watch",
-    "watch:server": "nodemon dist/app.js",
+    "watch:server": "nodemon dist/src/app.js",
     "test": "jest --detectOpenHandles"
   },
   "prettier": {

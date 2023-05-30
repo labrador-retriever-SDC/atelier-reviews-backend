@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import servicesLogic from '../services/services'
 
-import exampleReview from '../../tests/exampleReview';
-
 const getControllers = (db) => {
 
   const services = servicesLogic(db);

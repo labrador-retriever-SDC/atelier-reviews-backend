@@ -2,7 +2,6 @@ import { DataTypes } from 'sequelize';
 // import dbConnection from '../db/index'
 
 // const db = dbConnection();
-
 const createModels = (db) => {
 
 // Schemas
@@ -50,7 +49,7 @@ const Photo = db.define('photos', {
   url: { type: DataTypes.STRING, allowNull: false }
 }, {
   timestamps: false,
-  // indexes: [{ unique: false, fields: ['review_id'] }]
+  indexes: [{ unique: false, fields: ['review_id'] }]
 })
 
 const Characteristic = db.define('characteristics', {
