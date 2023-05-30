@@ -1,12 +1,14 @@
 import createServer from './server';
-import migrateData from './db/seed';
+import seedData from './db/seed';
+import dbConnection from './db/index'
 
-const app = createServer();
+const db = dbConnection();
+const app = createServer(db);
 
 const PORT = process.env.PORT || 3000;
 
 try {
-  migrateData();
+  seedData(db);
   app.listen(PORT, () => {console.log(`Now running on http://localhost:${PORT}`)})
 } catch (error) {
   console.log('Error ocurred')

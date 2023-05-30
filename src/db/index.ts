@@ -3,27 +3,32 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const dbName = process.env.DB_NAME || '';
+let dbName = process.env.DB_NAME || '';
 const dbUser = process.env.DB_USER || '';
 const dbPass = process.env.DB_PASS || '';
 const dbHost = process.env.DB_HOST || '';
 
 
-// Create a database connection
-// we can also pass in a connection uri, for example,
-// const sequelize = new Sequelize('postgres://user:pass@example.com:5432/dbName')
-const db = new Sequelize(dbName, dbUser, dbPass, {
-  host: dbHost,
-  dialect: 'postgres',
-  // benchmark: true,
-  // logging(sql, timing) {
-  //   console.log(`[Execution time: ${timing}ms]
-  //    -  ${sql} \n`)
-  // },
-  logging: false
-});
+const dbConnection = (mode = "dev") => {
 
-const dbConnection = () => db;
+  if (mode === "test") {
+    dbName = process.env.DB_NAME_TEST;
+  }
+
+  // Create a database connection
+  // we can also pass in a connection uri, for example,
+  // const sequelize = new Sequelize('postgres://user:pass@example.com:5432/dbName')
+  return new Sequelize(dbName, dbUser, dbPass, {
+    host: dbHost,
+    dialect: 'postgres',
+    // benchmark: true,
+    // logging(sql, timing) {
+    //   console.log(`[Execution time: ${timing}ms]
+    //    -  ${sql} \n`)
+    // },
+    logging: false
+  });
+};
 
 // // Testing connection
 // db.authenticate()
@@ -33,4 +38,4 @@ const dbConnection = () => db;
 //     console.error('Unable to connect to the database:', error));
 
 
-export default dbConnection ;
+export default dbConnection;

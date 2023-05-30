@@ -1,7 +1,9 @@
 import { DataTypes } from 'sequelize';
-import dbConnection from '../db/index'
+// import dbConnection from '../db/index'
 
-const db = dbConnection();
+// const db = dbConnection();
+
+const createModels = (db) => {
 
 // Schemas
 const Review = db.define('reviews', {
@@ -87,4 +89,7 @@ Photo.belongsTo(Review, { foreignKey: 'review_id' });
 // Characteristic.hasMany(CharacteristicsReview, { foreignKey: 'char_id' });
 // CharacteristicsReview.belongsTo(Characteristic, { foreignKey: 'char_id' });
 
-export { Review, Photo, Characteristic, CharacteristicsReview  }
+  return { Review, Photo, Characteristic, CharacteristicsReview  };
+}
+
+export default createModels;

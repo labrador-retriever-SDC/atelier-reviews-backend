@@ -1,23 +1,22 @@
 -- CREATE DATABASE reviews;
 -- \c reviews
 
-COPY reviews (product_id,rating,date,summary,body,recommend,reported,
-reviewer_name,reviewer_email,response,helpfulness)
+COPY reviews
 FROM '/tmp/data/reviews.csv'
 DELIMITER ','
 CSV HEADER;
 
-COPY photos (review_id,url)
+COPY photos
 FROM '/tmp/data/reviews_photos.csv'
 DELIMITER ','
 CSV HEADER;
 
-COPY characteristics (product_id,name)
+COPY characteristics
 FROM '/tmp/data/characteristics.csv'
 DELIMITER ','
 CSV HEADER;
 
-COPY characteristics_reviews (characteristic_id,review_id,value)
+COPY characteristics_reviews
 FROM '/tmp/data/characteristic_reviews.csv'
 DELIMITER ','
 CSV HEADER;

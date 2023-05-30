@@ -1,12 +1,13 @@
 import { Application } from 'express';
 import cors from 'cors';
-import * as controllers from './controllers/controllers'
+import getControllers from './controllers/controllers'
 
 const express = require('express');
 const logger = require('morgan');
 
-const createServer = () => {
+const createServer = (db) => {
   const app: Application = express();
+  const controllers = getControllers(db);
 
   app.use(express.json());
   app.use(cors());

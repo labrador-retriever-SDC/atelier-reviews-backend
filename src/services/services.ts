@@ -1,7 +1,10 @@
 /* eslint-disable camelcase */
 import { Sequelize } from 'sequelize';
-// import db from '../db/index'
-import { Review, Photo, Characteristic, CharacteristicsReview } from '../models/models';
+import createModels from '../models/models';
+
+const servicesLogic = (db) => {
+
+const { Review, Photo, Characteristic, CharacteristicsReview } = createModels(db);
 
 const getReviews = async (productID: string, count: string, sort: string, page: string) => {
   let order = '';
@@ -26,12 +29,12 @@ const getReviews = async (productID: string, count: string, sort: string, page: 
     order: [[order, 'DESC']],
     include: { model: Photo, attributes: ['id', 'url'] },
     benchmark: true,
-    logging(sql, timing) {
-      console.log(`\n[Execution time: ${timing}ms]
-      - get reviews
-      finding reviews for product ${productID}
-      with sort=${sort} page=${page} count=${count} \n`)
-    },
+    // logging(sql, timing) {
+    //   console.log(`\n[Execution time: ${timing}ms]
+    //   - get reviews
+    //   finding reviews for product ${productID}
+    //   with sort=${sort} page=${page} count=${count} \n`)
+    // },
     // raw: true
   })
 }
@@ -52,11 +55,11 @@ const getReviewsMeta = async (productID: string) => {
     group: 'rating',
     raw: true,
     benchmark: true,
-    logging(sql, timing) {
-      console.log(`\n[Execution time: ${timing}ms]
-      - get reviews metadata
-      count ratings for product ${productID} \n`)
-    },
+    // logging(sql, timing) {
+    //   console.log(`\n[Execution time: ${timing}ms]
+    //   - get reviews metadata
+    //   count ratings for product ${productID} \n`)
+    // },
   })
   const ratings = {};
   RatingCount.forEach(x => {
@@ -73,11 +76,11 @@ const getReviewsMeta = async (productID: string) => {
     group: 'recommend',
     raw: true,
     benchmark: true,
-    logging(sql, timing) {
-      console.log(`\n[Execution time: ${timing}ms]
-      - get reviews metadata
-      count recommendation for product ${productID} \n`)
-    },
+    // logging(sql, timing) {
+    //   console.log(`\n[Execution time: ${timing}ms]
+    //   - get reviews metadata
+    //   count recommendation for product ${productID} \n`)
+    // },
   })
   const recommended = {};
   RecommendCount.forEach(x => {
@@ -98,11 +101,11 @@ const getReviewsMeta = async (productID: string) => {
     ],
     raw: true,
     benchmark: true,
-    logging(sql, timing) {
-      console.log(`\n[Execution time: ${timing}ms]
-      - get reviews metadata
-      find average characteristics for product ${productID} \n`)
-    },
+    // logging(sql, timing) {
+    //   console.log(`\n[Execution time: ${timing}ms]
+    //   - get reviews metadata
+    //   find average characteristics for product ${productID} \n`)
+    // },
   })
   const Characteristics = {};
   charWithAvgValue.forEach(x => {
@@ -129,10 +132,10 @@ const addReview = async (newReview: any) => {
       date: Date.now()
     }, {
       benchmark: true,
-      logging(sql, timing) {
-        console.log(`\n[Execution time: ${timing}ms]
-        - create new review, update review table \n`)
-      },
+      // logging(sql, timing) {
+      //   console.log(`\n[Execution time: ${timing}ms]
+      //   - create new review, update review table \n`)
+      // },
     })
     const { id: review_id } = createdReview.toJSON();
 
@@ -146,11 +149,12 @@ const addReview = async (newReview: any) => {
       })
       Photo.bulkCreate(photos, {
         benchmark: true,
-        logging(sql, timing) {
-          console.log(`\n[Execution time: ${timing}ms]
-            - create new review, update photo table \n`)
-        },
+        // logging(sql, timing) {
+        //   console.log(`\n[Execution time: ${timing}ms]
+        //     - create new review, update photo table \n`)
+        // },
       })
+      .catch(err => console.log('ERROR adding photos', err))
     }
 
     /**
@@ -163,10 +167,11 @@ const addReview = async (newReview: any) => {
       })
     CharacteristicsReview.bulkCreate(characteristics, {
       benchmark: true,
-      logging(sql, timing) {
-        console.log(`\n[Execution time: ${timing}ms] \n\t - create new review, update CharacteristicsReview table \n`)
-      },
+      // logging(sql, timing) {
+      //   console.log(`\n[Execution time: ${timing}ms] \n\t - create new review, update CharacteristicsReview table \n`)
+      // },
     })
+    .catch(err => console.log('ERROR adding Chars', err))
 
     return undefined;
   } catch (err) {
@@ -181,10 +186,10 @@ const markHelpful = (reviewID: string) =>
     {
       where: { id: Number(reviewID) },
       benchmark: true,
-      logging(sql, timing) {
-        console.log(`\n[Execution time: ${timing}ms]
-        - marked review ${reviewID} helpful  \n`)
-      },
+      // logging(sql, timing) {
+      //   console.log(`\n[Execution time: ${timing}ms]
+      //   - marked review ${reviewID} helpful  \n`)
+      // },
     },
   );
 
@@ -195,12 +200,14 @@ const reportReview = (reviewID: string) =>
     {
       where: { id: Number(reviewID) },
       benchmark: true,
-      logging(sql, timing) {
-        console.log(`\n[Execution time: ${timing}ms]
-        - reported review ${reviewID}  \n`)
-      },
+      // logging(sql, timing) {
+      //   console.log(`\n[Execution time: ${timing}ms]
+      //   - reported review ${reviewID}  \n`)
+      // },
     },
   );
 
+  return { getReviews, markHelpful, reportReview, getReviewsMeta, addReview };
+}
 
-export { getReviews, markHelpful, reportReview, getReviewsMeta, addReview }
+export default servicesLogic;
