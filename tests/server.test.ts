@@ -1,7 +1,6 @@
 import request from "supertest";
 import createServer from "../src/server";
 import dbConnection from '../src/db/index';
-import seedData from '../src/db/seed';
 
 import exampleReview from './exampleReview';
 
@@ -12,7 +11,6 @@ describe("API Integration Tests", () => {
 
   beforeAll(async () => {
     await testDB.sync();
-    // await seedData(testDB);
     server = app.listen(7890);
   }, 6500);
 
