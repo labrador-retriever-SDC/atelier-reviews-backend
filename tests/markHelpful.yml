@@ -1,0 +1,40 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    # this injects 10 virtual users every second for 30s
+    - name: Warming up - constant arrival rate
+      duration: 60
+      arrivalRate: 10
+
+    # this ramps up virtual users from 10 to 100 in 60s
+    - name: Ramping up load
+      duration: 120
+      arrivalRate: 10
+      rampTo: 100
+
+    # this ramps up virtual users from 100 to 500 in 60s
+    - name: Ramping up load
+      duration: 240
+      arrivalRate: 100
+      rampTo: 500
+
+    # this will create 200 virtual users in 2 minutes
+    - name: Sustained load
+      duration: 120
+      arrivalRate: 500
+
+scenarios:
+  - name: "Mark review 5774891 helpful"
+    flow:
+      - put:
+          url: "/reviews/5774891/helpful"
+
+  - name: "Mark review 5774953 helpful"
+    flow:
+      - put:
+          url: "/reviews/5774953/helpful"
+
+  - name: "Mark review 71271 helpful"
+    flow:
+      - put:
+          url: "/reviews/71271/helpful"
