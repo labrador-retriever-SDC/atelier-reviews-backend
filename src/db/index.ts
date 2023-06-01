@@ -3,22 +3,34 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-let dbName = process.env.DB_NAME || '';
-const dbUser = process.env.DB_USER || '';
-const dbPass = process.env.DB_PASS || '';
-const dbHost = process.env.DB_HOST || '';
+let dbUser = '';
+let dbPass = '';
+let dbHost = '';
+let dbName = '';
 
-
-const dbConnection = (mode = "dev") => {
-
-  if (mode === "test") {
+switch (process.env.NODE_ENV) {
+  case "test":
+    dbUser = process.env.DB_USER_TEST;
+    dbPass = process.env.DB_PASS_TEST;
+    dbHost = process.env.DB_HOST_TEST;
     dbName = process.env.DB_NAME_TEST;
-  }
+    break;
+  case "prod":
+    dbUser = process.env.DB_USER_PROD;
+    dbPass = process.env.DB_PASS_PROD;
+    dbHost = process.env.DB_HOST_PROD;
+    dbName = process.env.DB_NAME_PROD;
+    break;
+  default:
+    dbUser = process.env.DB_USER;
+    dbPass = process.env.DB_PASS;
+    dbHost = process.env.DB_HOST;
+    dbName = process.env.DB_NAME;
+}
 
-  // Create a database connection
-  // we can also pass in a connection uri, for example,
-  // const sequelize = new Sequelize('postgres://user:pass@example.com:5432/dbName')
-  return new Sequelize(dbName, dbUser, dbPass, {
+
+const dbConnection = () =>
+  new Sequelize(dbName, dbUser, dbPass, {
     host: dbHost,
     dialect: 'postgres',
     // benchmark: true,
@@ -28,7 +40,7 @@ const dbConnection = (mode = "dev") => {
     // },
     logging: false
   });
-};
+;
 
 // // Testing connection
 // db.authenticate()

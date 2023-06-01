@@ -2,22 +2,22 @@
 -- \c reviews
 
 COPY reviews
-FROM '/tmp/data/reviews.csv'
+FROM '/Users/ShuhuaL/Documents/HackReactor/SDC/atelier-reviews-backend/src/db/data/reviews.csv'
 DELIMITER ','
 CSV HEADER;
 
 COPY photos
-FROM '/tmp/data/reviews_photos.csv'
+FROM '/Users/ShuhuaL/Documents/HackReactor/SDC/atelier-reviews-backend/src/db/data/reviews_photos.csv'
 DELIMITER ','
 CSV HEADER;
 
 COPY characteristics
-FROM '/tmp/data/characteristics.csv'
+FROM '/Users/ShuhuaL/Documents/HackReactor/SDC/atelier-reviews-backend/src/db/data/characteristics.csv'
 DELIMITER ','
 CSV HEADER;
 
 COPY characteristics_reviews
-FROM '/tmp/data/characteristic_reviews.csv'
+FROM '/Users/ShuhuaL/Documents/HackReactor/SDC/atelier-reviews-backend/src/db/data/characteristic_reviews.csv'
 DELIMITER ','
 CSV HEADER;
 
