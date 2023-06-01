@@ -13,11 +13,6 @@ let dbHost = '';
 let dbPort = 5432;
 let dbName = '';
 
-if (process.env.NODE_ENV === "test") {
-  dbPort = process.env.DB_PORT_TEST;
-  dbName = process.env.DB_NAME_TEST;
-}
-
 switch (process.env.NODE_ENV) {
   case "test":
     dbUser = process.env.DB_USER_TEST;

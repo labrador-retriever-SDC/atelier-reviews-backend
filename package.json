@@ -39,13 +39,14 @@
     "lint": "eslint . --ext .js,.ts .",
     "fix": "eslint . --ext .js,.ts . --fix",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-    "start": "ts-node src/app.ts",
     "watch:build": "tsc -watch",
-    "watch:server": "nodemon dist/src/app.js",
+    "watch:server": "nodemon dist/app.js",
     "test": "jest --detectOpenHandles",
     "db:seed": "node src/ETL/seed.js",
     "test:seed": "NODE_ENV=test node src/ETL/seed.js",
-    "prod:seed": "NODE_ENV=prod node src/ETL/seed.js"
+    "prod:seed": "NODE_ENV=prod node src/ETL/seed.js",
+    "build": "tsc -p .",
+    "start": "node dist/app.js"
   },
   "prettier": {
     "trailingComma": "es5",
