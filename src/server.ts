@@ -17,6 +17,8 @@ const createServer = (db) => {
   /**
    * Routes
    */
+  app.get('/loaderio-63ca43d7f33edb6da27443a614b17999', controllers.loaderio)
+
   app.get('/', controllers.home);
   app.get('/reviews', controllers.getReviews)
   app.get('/reviews/meta', controllers.getReviewsMeta)
