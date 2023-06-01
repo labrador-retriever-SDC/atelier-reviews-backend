@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS characteristics_reviews;
 DROP TABLE IF EXISTS characteristics;
 DROP TABLE IF EXISTS photos;
@@ -49,3 +48,23 @@ CREATE INDEX reviews_product_id ON reviews (product_id);
 CREATE INDEX photos_review_id ON photos (review_id);
 CREATE INDEX characteristics_product_id ON characteristics (product_id) ;
 CREATE INDEX characteristics_reviews_char_id ON characteristics_reviews (char_id);
+
+-- COPY reviews
+-- FROM '/tmp/data/reviews.csv'
+-- DELIMITER ','
+-- CSV HEADER;
+
+-- COPY photos
+-- FROM '/tmp/data/reviews_photos.csv'
+-- DELIMITER ','
+-- CSV HEADER;
+
+-- COPY characteristics
+-- FROM '/tmp/data/characteristics.csv'
+-- DELIMITER ','
+-- CSV HEADER;
+
+-- COPY characteristics_reviews
+-- FROM '/tmp/data/characteristic_reviews.csv'
+-- DELIMITER ','
+-- CSV HEADER;

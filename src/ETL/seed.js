@@ -6,16 +6,39 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const dbDefault = process.env.DB_NAME_DEFAULT || '';
-const dbUser = process.env.DB_USER || '';
-const dbPass = process.env.DB_PASS || '';
-const dbHost = process.env.DB_HOST || '';
 
-let dbPort = process.env.DB_PORT || 5432;
-let dbName = process.env.DB_NAME || '';
+let dbUser = '';
+let dbPass = '';
+let dbHost = '';
+let dbPort = 5432;
+let dbName = '';
 
 if (process.env.NODE_ENV === "test") {
   dbPort = process.env.DB_PORT_TEST;
   dbName = process.env.DB_NAME_TEST;
+}
+
+switch (process.env.NODE_ENV) {
+  case "test":
+    dbUser = process.env.DB_USER_TEST;
+    dbPass = process.env.DB_PASS_TEST;
+    dbHost = process.env.DB_HOST_TEST;
+    dbPort = process.env.DB_PORT_TEST;
+    dbName = process.env.DB_NAME_TEST;
+    break;
+  case "prod":
+    dbUser = process.env.DB_USER_PROD;
+    dbPass = process.env.DB_PASS_PROD;
+    dbHost = process.env.DB_HOST_PROD;
+    dbPort = process.env.DB_PORT_PROD;
+    dbName = process.env.DB_NAME_PROD;
+    break;
+  default:
+    dbUser = process.env.DB_USER;
+    dbPass = process.env.DB_PASS;
+    dbHost = process.env.DB_HOST;
+    dbPort = process.env.DB_PORT;
+    dbName = process.env.DB_NAME;
 }
 
 const createDatabaseIfNotExists = async (database) => {
@@ -96,5 +119,9 @@ const initializeDatabase = async (database) => {
 
 }
 
-createDatabaseIfNotExists(dbName);
-initializeDatabase(dbName)
+const run = async () => {
+  await createDatabaseIfNotExists(dbName);
+  await initializeDatabase(dbName);
+}
+run();
+

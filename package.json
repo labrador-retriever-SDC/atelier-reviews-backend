@@ -44,7 +44,8 @@
     "watch:server": "nodemon dist/src/app.js",
     "test": "jest --detectOpenHandles",
     "db:seed": "node src/ETL/seed.js",
-    "test:seed": "NODE_ENV=test node src/ETL/seed.js"
+    "test:seed": "NODE_ENV=test node src/ETL/seed.js",
+    "prod:seed": "NODE_ENV=prod node src/ETL/seed.js"
   },
   "prettier": {
     "trailingComma": "es5",
