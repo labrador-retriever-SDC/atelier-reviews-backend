@@ -13,6 +13,10 @@ const getControllers = (db) => {
     res.status(404).send({ error: true, message: 'Page not found. Check your URL please' });
   }
 
+  const loaderio = (req: Request, res: Response) => {
+    res.send("loaderio-63ca43d7f33edb6da27443a614b17999");
+  }
+
   /**
    * Parameters:
    * product_id: required
@@ -82,7 +86,8 @@ const getControllers = (db) => {
     createReview,
     markHelpful,
     reportReview,
-    noSuchPage
+    noSuchPage,
+    loaderio
   }
 
 }
