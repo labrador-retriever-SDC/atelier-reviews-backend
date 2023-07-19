@@ -18,7 +18,7 @@
 
 ## About The Project
 
-The goal of the project was to build a scalable RESTful API for an existing e-commerce web application and optimize it to withstand the web scale traffic loads. Working in a team of three engineers, we inherited a legacy codebase and each member took ownership of a micro service that will maintain the existing application data set. I was responsible for redesigning and building a backend server and database for the Q & A API service.
+The goal of the project was to build a scalable RESTful API for an existing e-commerce web application and optimize it to withstand the web scale traffic loads. Working in a team of three engineers, we inherited a legacy codebase and each member took ownership of a micro service that will maintain the existing application data set. I was responsible for redesigning and building a backend server and database for the Ratings & Reviews API service.
 
 ### Built With
 
@@ -34,17 +34,20 @@ The goal of the project was to build a scalable RESTful API for an existing e-co
   <img src='https://img.shields.io/badge/Amazon%20AWS-232F3E.svg?style=for-the-badge&logo=Amazon-AWS&logoColor=white' />
 </div>
 
+<br/>
+
 ## API Development & Optimization
 
 <p align="center">
-    <img src="./images/reviews-schema.png" alt="Database Schema">
+    <span align="center">Database Schema</span>
+    <img src="./images/reviews-schema.png" alt="Database Schema" width="90%" title="Database Schema">
 </p>
 
 -   Designed and evaluated RDBMS and DBMS and consider tradeoffs: selected PostgreSQL
-
 -   Performed an ETL Process to transfer the existing data set (11M+) into PostgreSQL database
-
 -   Optimize queries by implementing aggregate subqueries, and foreign key indexes
+
+<br/>
 
 ## Deployment & Testing
 
@@ -52,11 +55,14 @@ The goal of the project was to build a scalable RESTful API for an existing e-co
 -   Set up NGINX load balancer with ip_hash method for horizontal scaling and reduce latency by 200%
 -   Scale microservice to handle 1000 RPS by deploying 3 Node/Express servers and database on AWS EC2
 
+<br/>
+
 ## API Reference
 
 #### List Reviews
 
 Returns a list of reviews for a particular product. This list _does not_ include any reported reviews.
+
 `GET /reviews/:product_id/list`
 
 Parameters
@@ -138,6 +144,8 @@ Parameters
 | review_id | integer | Required ID of the review to update |
 
 Response `Status: 204 NO CONTENT `
+
+<br/>
 
 ## Other Services
 
